@@ -1,6 +1,6 @@
 // variables / html nodes
 const container = document.getElementById("container");
-var curryId;
+const curryIdField = document.getElementById("curry-id");
 
 // loading icon
 loadingIcon = 'Spinner-3.gif';
@@ -27,7 +27,7 @@ function sortCourses(array) {
 }
 
 // check if course already has an UUID
-function hasUUID(course){
+function hasUUID(course) {
   const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return regex.test(course.coursepage_info.trim());
 }
@@ -42,7 +42,7 @@ async function getUUID() {
 // generate table with courses and UUID-copy-buttons
 async function makeUUIDbuttons() {
 
-  let response = await fetch(`https://api.sww.curry-software.com/api/school/${curryId}`);
+  let response = await fetch(`https://api.sww.curry-software.com/api/school/${curryIdField.value}`);
   let data = await response.json();
   let courses = sortCourses(data.courses);
 
@@ -102,7 +102,6 @@ async function makeUUIDbuttons() {
 // main generate function
 async function generateUUIDs() {
 
-  curryId = document.getElementById("curry-id").value;
   container.innerHTML = '';
 
   await makeUUIDbuttons()
@@ -136,7 +135,7 @@ async function generateUUIDs() {
           let courseId = uuidButtons[i].getAttribute('data-curryId') || null;
 
           if (courseId) {
-            window.open(`https://sww.curry-software.com/#/edit/course/${curryId}/${courseId}?`, '_blank');
+            window.open(`https://sww.curry-software.com/#/edit/course/${curryIdField.value}/${courseId}?`, '_blank');
           }
 
         });
@@ -145,3 +144,8 @@ async function generateUUIDs() {
     })
 
 }
+
+// load curry id from url params (if any)
+const query = window.location.search;
+const params = new URLSearchParams(query);
+if (params.has('curryId')) curryIdField.value = params.get('curryId');
