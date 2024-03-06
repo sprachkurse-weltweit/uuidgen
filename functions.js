@@ -34,17 +34,29 @@ function hasUUID(course) {
 
 // get UUID from uuidtools.com
 async function getUUID() {
-  let response = await fetch('https://www.uuidtools.com/api/generate/v4');
-  let array = await response.json();
-  return array[0];
+  try {
+    let response = await fetch('https://www.uuidtools.com/api/generate/v4');
+    let array = await response.json();
+    return array[0];
+  }
+  catch (err) {
+    console.log(err);
+    if (confirm('Fehler beim Erzeugen der UUIDs!\nAm besten nocheinmal versuchen.\n\nSeite neu laden?')) window.location.reload();
+  }
 }
 
 // generate table with courses and UUID-copy-buttons
 async function makeUUIDbuttons() {
 
-  let response = await fetch(`https://api.sww.curry-software.com/api/school/${curryIdField.value}`);
-  let data = await response.json();
-  let courses = sortCourses(data.courses);
+  try {
+    let response = await fetch(`https://api.sww.curry-software.com/api/school/${curryIdField.value}`);
+    let data = await response.json();
+    let courses = sortCourses(data.courses);
+  }
+  catch (err) {
+    console.log(err);
+    if (confirm('Fehler bei der Abfrage der DB!\nMöglicherweise stimmt die Curry ID nicht.\n\nSeite neu laden?')) window.location.reload();
+  }
 
   container.innerHTML += `
     <h2>${data.name} (${courses.length} Kurse)</h2>
@@ -60,8 +72,8 @@ async function makeUUIDbuttons() {
   table.innerHTML = `
     <tr>
       <th style="width: 40px;">Aktiv?</th>
-      <th style="width: 300px;">Kurs</th>
-      <th style="width: 300px;">UUID kopieren</th>
+      <th style="width: 320px;">Kurs</th>
+      <th style="width: 320px;">UUID kopieren und Kurs in DB öffnen</th>
     </tr>
   `;
 
@@ -82,9 +94,9 @@ async function makeUUIDbuttons() {
             id="${uuid}" 
             class="uuid-button"
             data-curryId="${courses[i].id}" 
-            style="color: white; background-color: green; border-radius: 8px; cursor: pointer; padding: 5px;"
+            style="color: white; background-color: green; border-radius: 8px; cursor: pointer; padding: 5px; font-family: monospace;"
           >
-            COPY ${uuid}
+            ${uuid}
           </button>
         `}
       </td>
@@ -108,10 +120,10 @@ async function generateUUIDs() {
       let uuidButtons = document.querySelectorAll('.uuid-button');
 
       for (let i = 0; i < uuidButtons.length; i++) {
-        uuidButtons[i].addEventListener('click', function (e) {
-          e.preventDefault();
+        uuidButtons[i].addEventListener('click', function () {
+          // warn if UUID was already copied
           if (uuidButtons[i].getAttribute('data-used')) {
-            alert(`WARNING:\n\nUUID ${uuidButtons[i].id} was already used!`)
+            if (!confirm(`ACHTUNG:\n\nUUID ${uuidButtons[i].id} wurde bereits verwendet!`)) return;
           }
           // copy UUID to clipboard
           const textArea = document.createElement("textarea");
@@ -126,7 +138,7 @@ async function generateUUIDs() {
           }
           uuidButtons[i].removeChild(textArea);
 
-          uuidButtons[i].innerText = `USED ${uuidButtons[i].id}`;
+          uuidButtons[i].innerText = uuidButtons[i].id;
           uuidButtons[i].setAttribute('data-used', true);
           uuidButtons[i].style.backgroundColor = 'red';
 
