@@ -48,10 +48,12 @@ async function getUUID() {
 // generate table with courses and UUID-copy-buttons
 async function makeUUIDbuttons() {
 
+  let data, courses;
+
   try {
     let response = await fetch(`https://api.sww.curry-software.com/api/school/${curryIdField.value}`);
-    let data = await response.json();
-    let courses = sortCourses(data.courses);
+    data = await response.json();
+    courses = sortCourses(data.courses);
   }
   catch (err) {
     console.log(err);
