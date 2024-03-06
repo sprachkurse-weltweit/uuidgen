@@ -61,7 +61,6 @@ async function makeUUIDbuttons() {
     <tr>
       <th style="width: 40px;">Aktiv?</th>
       <th style="width: 300px;">Kurs</th>
-      <th>Kursart</th>
       <th style="width: 300px;">UUID kopieren</th>
     </tr>
   `;
@@ -73,7 +72,6 @@ async function makeUUIDbuttons() {
     uuidRow.innerHTML = `
       <td style="background-color: ${courses[i].active ? 'green' : 'red'};"></td>
       <td>${courses[i].name}</td>
-      <td>${courses[i].new_kind}</td>
       <td>
         ${hasUUID(courses[i]) ? `
           <strong>Kurs hat bereits eine UUID!</strong>
